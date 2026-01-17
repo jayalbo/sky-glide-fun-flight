@@ -90,16 +90,8 @@
             cursor: pointer;
             margin-top: 20px;
             box-shadow: 0 6px 0 #166534;
-            transition: transform 0.1s;
         }
         .btn-play:active { transform: translateY(3px); box-shadow: 0 3px 0 #166534; }
-
-        .high-score-label {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 15px;
-            display: block;
-        }
 
         #footer-branding {
             position: absolute;
@@ -124,10 +116,6 @@
             <div id="energy-container"><div id="energy-bar"></div></div>
         </div>
         <div class="stat-bubble">
-            <span class="label">BEST</span>
-            <span class="value" id="hud-best-val">0</span>
-        </div>
-        <div class="stat-bubble">
             <span class="label">SCORE</span>
             <span class="value" id="score-val">0</span>
         </div>
@@ -137,7 +125,6 @@
         <div class="card">
             <h1 id="title">SKY GLIDE!</h1>
             <p id="msg" style="color: #64748b; font-weight: bold;">Flap your wings and collect the hoops!</p>
-            <span class="high-score-label">BEST: <span id="best-val">0</span></span>
             <button class="btn-play" onclick="startGame()">START!</button>
         </div>
     </div>
@@ -150,13 +137,8 @@
     <script>
         let scene, camera, renderer, plane, active = false;
         let score = 0, energy = 100, velY = 0, audioCtx;
-        let highScore = localStorage.getItem('skyGlideHighScore') || 0;
         const rings = [], scenery = [];
-        const BASE_SPEED = 0.25;
-        let currentSpeed = BASE_SPEED;
-
-        document.getElementById('best-val').innerText = highScore;
-        document.getElementById('hud-best-val').innerText = highScore;
+        let currentSpeed = 0.25;
 
         function init() {
             scene = new THREE.Scene();
@@ -178,7 +160,6 @@
             directional.position.set(5, 15, 5);
             scene.add(directional);
 
-            // Plane
             const pGroup = new THREE.Group();
             const pMat = new THREE.MeshPhongMaterial({ color: 0xf472b6 });
             const pBody = new THREE.Mesh(new THREE.SphereGeometry(0.7, 16, 16), pMat);
@@ -188,7 +169,6 @@
             plane = pGroup;
             scene.add(plane);
 
-            // Ground Hills
             const groundGeo = new THREE.SphereGeometry(20, 32, 32);
             const groundMat = new THREE.MeshPhongMaterial({ color: 0x4ade80 });
             for(let i=0; i<15; i++) {
@@ -199,7 +179,6 @@
                 scenery.push(hill);
             }
 
-            // Volumetric Clouds
             const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
             for(let i=0; i<12; i++) {
                 const cloud = new THREE.Group();
@@ -255,7 +234,8 @@
         function startGame() {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('hud').classList.remove('hidden');
-            active = true; score = 0; energy = 100; velY = 0; currentSpeed = BASE_SPEED;
+            active = true; score = 0; energy = 100; velY = 0;
+            currentSpeed = 0.25;
             plane.position.set(0, 10, 0);
             rings.forEach(r => scene.remove(r));
             rings.length = 0;
@@ -270,21 +250,14 @@
                 plane.position.y += velY;
                 plane.rotation.z = velY * 2;
 
-                // Speed increases with score
-                currentSpeed = BASE_SPEED + (score / 1000);
+                currentSpeed = 0.25 + (score * 0.002);
 
                 energy -= 0.06;
                 if(energy <= 0 || plane.position.y < -5 || plane.position.y > 35) {
                     active = false;
-                    if(score > highScore) {
-                        highScore = score;
-                        localStorage.setItem('skyGlideHighScore', highScore);
-                        document.getElementById('best-val').innerText = highScore;
-                        document.getElementById('hud-best-val').innerText = highScore;
-                    }
                     document.getElementById('menu').classList.remove('hidden');
-                    document.getElementById('title').innerText = score >= highScore && score > 0 ? "NEW BEST!" : "OH NO!";
-                    document.getElementById('msg').innerText = "Final Score: " + score;
+                    document.getElementById('title').innerText = "OH NO!";
+                    document.getElementById('msg').innerText = "Better luck next time!";
                     playSound(200, 0.4);
                 }
 
