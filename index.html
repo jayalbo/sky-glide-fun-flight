@@ -90,8 +90,16 @@
             cursor: pointer;
             margin-top: 20px;
             box-shadow: 0 6px 0 #166534;
+            transition: transform 0.1s;
         }
         .btn-play:active { transform: translateY(3px); box-shadow: 0 3px 0 #166534; }
+
+        .high-score-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 15px;
+            display: block;
+        }
 
         #footer-branding {
             position: absolute;
@@ -116,8 +124,8 @@
             <div id="energy-container"><div id="energy-bar"></div></div>
         </div>
         <div class="stat-bubble">
-            <span class="label">HIGH SCORE</span>
-            <span class="value" id="high-score-val">0</span>
+            <span class="label">BEST</span>
+            <span class="value" id="hud-best-val">0</span>
         </div>
         <div class="stat-bubble">
             <span class="label">SCORE</span>
@@ -129,9 +137,7 @@
         <div class="card">
             <h1 id="title">SKY GLIDE!</h1>
             <p id="msg" style="color: #64748b; font-weight: bold;">Flap your wings and collect the hoops!</p>
-            <div id="final-stats" class="hidden" style="margin-bottom: 20px;">
-                <div style="font-size: 18px; color: var(--text);">Best Score: <span id="best-score-end">0</span></div>
-            </div>
+            <span class="high-score-label">BEST: <span id="best-val">0</span></span>
             <button class="btn-play" onclick="startGame()">START!</button>
         </div>
     </div>
@@ -146,8 +152,11 @@
         let score = 0, energy = 100, velY = 0, audioCtx;
         let highScore = localStorage.getItem('skyGlideHighScore') || 0;
         const rings = [], scenery = [];
-        let baseSpeed = 0.25;
-        let currentSpeed = baseSpeed;
+        const BASE_SPEED = 0.25;
+        let currentSpeed = BASE_SPEED;
+
+        document.getElementById('best-val').innerText = highScore;
+        document.getElementById('hud-best-val').innerText = highScore;
 
         function init() {
             scene = new THREE.Scene();
@@ -179,7 +188,7 @@
             plane = pGroup;
             scene.add(plane);
 
-            // Ground & Clouds
+            // Ground Hills
             const groundGeo = new THREE.SphereGeometry(20, 32, 32);
             const groundMat = new THREE.MeshPhongMaterial({ color: 0x4ade80 });
             for(let i=0; i<15; i++) {
@@ -190,6 +199,7 @@
                 scenery.push(hill);
             }
 
+            // Volumetric Clouds
             const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
             for(let i=0; i<12; i++) {
                 const cloud = new THREE.Group();
@@ -202,8 +212,6 @@
                 scene.add(cloud);
                 scenery.push(cloud);
             }
-
-            document.getElementById('high-score-val').innerText = highScore;
 
             window.addEventListener('resize', onResize);
             window.addEventListener('mousedown', flap);
@@ -247,13 +255,12 @@
         function startGame() {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('hud').classList.remove('hidden');
-            active = true; score = 0; energy = 100; velY = 0; currentSpeed = baseSpeed;
+            active = true; score = 0; energy = 100; velY = 0; currentSpeed = BASE_SPEED;
             plane.position.set(0, 10, 0);
             rings.forEach(r => scene.remove(r));
             rings.length = 0;
             for(let i=0; i<3; i++) createRing(-40 - (i*40));
             playSound(523, 0.2);
-            document.getElementById('score-val').innerText = score;
         }
 
         function animate() {
@@ -263,9 +270,22 @@
                 plane.position.y += velY;
                 plane.rotation.z = velY * 2;
 
+                // Speed increases with score
+                currentSpeed = BASE_SPEED + (score / 1000);
+
                 energy -= 0.06;
                 if(energy <= 0 || plane.position.y < -5 || plane.position.y > 35) {
-                    endGame();
+                    active = false;
+                    if(score > highScore) {
+                        highScore = score;
+                        localStorage.setItem('skyGlideHighScore', highScore);
+                        document.getElementById('best-val').innerText = highScore;
+                        document.getElementById('hud-best-val').innerText = highScore;
+                    }
+                    document.getElementById('menu').classList.remove('hidden');
+                    document.getElementById('title').innerText = score >= highScore && score > 0 ? "NEW BEST!" : "OH NO!";
+                    document.getElementById('msg').innerText = "Final Score: " + score;
+                    playSound(200, 0.4);
                 }
 
                 scenery.forEach(s => {
@@ -281,8 +301,6 @@
                         if(Math.abs(plane.position.y - r.position.y) < 6) {
                             score += 10; energy = Math.min(100, energy + 30);
                             playSound(800, 0.1);
-                            // Increase speed every point
-                            currentSpeed += 0.01;
                         } else {
                             energy -= 15;
                             playSound(150, 0.2);
@@ -298,21 +316,6 @@
                 document.getElementById('score-val').innerText = score;
             }
             renderer.render(scene, camera);
-        }
-
-        function endGame() {
-            active = false;
-            playSound(200, 0.4);
-            if(score > highScore) {
-                highScore = score;
-                localStorage.setItem('skyGlideHighScore', highScore);
-            }
-            document.getElementById('high-score-val').innerText = highScore;
-            document.getElementById('best-score-end').innerText = highScore;
-            document.getElementById('menu').classList.remove('hidden');
-            document.getElementById('final-stats').classList.remove('hidden');
-            document.getElementById('title').innerText = "GAME OVER!";
-            document.getElementById('msg').innerText = "Score: " + score;
         }
 
         init();

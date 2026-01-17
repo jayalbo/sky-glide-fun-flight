@@ -1,23 +1,33 @@
-# Sky Glide | Fun Flight
+# Sky Glide | Fun Flight ✈️
 
-A colorful, fun 3D flight game built with Three.js. Pilot your pink glider through rolling green hills and collect golden hoops to keep your energy up!
-
-## 🚀 Play Now
-The game is hosted on GitHub Pages: [Play Sky Glide](https://jayalbo.github.io/sky-glide-fun-flight/)
+A colorful, kid-friendly 3D flight game built with Three.js. Pilot your plane through giant golden hoops, collect energy, and see how long you can last as the world speeds up!
 
 ## 🎮 How to Play
-- **Spacebar / Click / Touch**: Flap your wings to gain height.
-- **Goal**: Fly through the yellow hoops to earn points and refuel your energy bar.
-- **Difficulty**: Watch out! The game gets faster and faster every time you fly through a hoop!
-- **Game Over**: Don't let your energy run out, and don't fly too high or too low!
 
-## 🛠 Built With
-- **Three.js**: 3D Graphics engine.
-- **HTML5/CSS3**: UI and layout.
-- **Web Audio API**: Procedural sound effects.
+- **Start the Game:** Click the "START!" button on the menu.
+- **Control:** 
+  - **Desktop:** Press **Spacebar** or **Click** the mouse to flap your wings and gain altitude.
+  - **Mobile:** **Tap** anywhere on the screen.
+- **Goal:** Fly through the golden hoops to earn score points and refill your fuel.
+- **Difficulty:** The game gets faster and faster the higher your score gets!
+- **Game Over:** If you run out of fuel or fly too high/low, the flight ends. Try to beat your high score!
 
-## 👨‍💻 Credits
-- **Created by**: Code by Voice
-- **Powered by**: Agora Conversational AI
+## ✨ Features
 
-Enjoy your flight!
+- **Progressive Difficulty:** The world speed increases as you score points.
+- **High Score Tracking:** Your best score is saved to your browser's local storage.
+- **3D Graphics:** Beautifully rendered 3D hills, volumetric clouds, and a colorful plane.
+- **Sound Effects:** Fun procedural audio for flaps and scoring.
+- **Mobile Friendly:** Works great on touch devices.
+
+## 🛠️ Technology Stack
+
+- **[Three.js](https://threejs.org/):** For 3D rendering.
+- **HTML5 Canvas:** For high-performance graphics.
+- **Vanilla JavaScript:** For game logic and state management.
+- **Web Audio API:** For procedural sound effects.
+
+## 🚀 Powered By
+
+- **Code by Voice**
+- **Powered by Agora Conversational AI**
